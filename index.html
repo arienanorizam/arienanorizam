@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Security Analytics: Derivatives in Malaysian Oil Palm Growth</title>
+    <!-- Tailwind CSS for modern, clean UI styling -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- MathJax for rendering beautiful LaTeX mathematical formulas -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/dist/mathjax.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
+        
+        <!-- Header Banner -->
+        <div class="bg-gradient-to-r from-emerald-600 to-teal-700 p-6 md:p-8 text-white">
+            <span class="bg-emerald-500/30 text-emerald-100 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+                SFM: Food Security & Bioscience Math
+            </span>
+            <h1 class="text-2xl md:text-4xl font-extrabold mt-2">Oil Palm FFB Yield Optimization</h1>
+            <p class="text-emerald-100 mt-2 text-sm md:text-base max-w-2xl">
+                Utilizing calculus to analyze Fresh Fruit Bunch (FFB) accumulation rates for precision agricultural interventions in Malaysia.
+            </p>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Side: Scenario and Math formulas -->
+            <div class="lg:col-span-1 flex flex-col justify-between space-y-6">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900 border-b pb-2 border-slate-200">The Bioscience Problem</h2>
+                    <p class="text-slate-600 text-sm mt-2 leading-relaxed">
+                        To guarantee national and global food security, Malaysian plantation managers must optimize the yield of oil palm trees (<em>Elaeis guineensis</em>). 
+                    </p>
+                    <p class="text-slate-600 text-sm mt-2 leading-relaxed">
+                        The cumulative weight gain of Fresh Fruit Bunches (FFB) per tree follows a **Logistic Growth Curve**. By calculating the **first derivative $f'(x)$**, we discover the exact day when the growth rate peaks (the inflection point). This dictates the optimal window for targeted fertilizer application to maximize sustainable output.
+                    </p>
+                </div>
+
+                <!-- Mathematical Formulas -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <h3 class="text-sm font-bold text-slate-700 mb-2">Mathematical Modeling</h3>
+                    
+                    <div class="mb-4">
+                        <span class="text-xs font-semibold text-emerald-700 block">Yield Function $f(x)$:</span>
+                        <div class="text-sm py-1 bg-white rounded border border-slate-100 text-center my-1 shadow-xs">
+                            $$f(x) = \frac{L}{1 + e^{-k(x - x_0)}}$$
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="text-xs font-semibold text-amber-700 block">Growth Rate Derivative $f'(x)$:</span>
+                        <div class="text-sm py-1 bg-white rounded border border-slate-100 text-center my-1 shadow-xs">
+                            $$f'(x) = k \cdot f(x) \left(1 - \frac{f(x)}{L}\right)$$
+                        </div>
+                    </div>
+                    
+                    <div class="text-[11px] text-slate-500 mt-3 space-y-1">
+                        <p><strong>Where constants are calibrated to MPOB field standards:</strong></p>
+                        <p>• $L = 25\text{ kg}$ (Maximum potential FFB capacity per bunch)</p>
+                        <p>• $k = 0.08$ (Growth steepness coefficient)</p>
+                        <p>• $x_0 = 90\text{ days}$ (Midpoint of typical 180-day bunch maturation cycle)</p>
+                    </div>
+                </div>
+
+                <!-- Data Reference Sources -->
+                <div class="text-xs text-slate-400 bg-slate-100/50 p-3 rounded-lg">
+                    <span class="font-bold block text-slate-500 mb-1">Data Context & Reference:</span>
+                    Growth dynamics modeled after physiological yield frameworks published in the 
+                    <a href="https://mpob.gov.my/" target="_blank" class="text-emerald-600 hover:underline font-semibold">Malaysian Palm Oil Board (MPOB) Journal of Oil Palm Research</a>.
+                </div>
+            </div>
+
+            <!-- Right Side: Interactive Graph & Live Dashboard -->
+            <div class="lg:col-span-2 flex flex-col justify-between">
+                <div class="bg-slate-900 rounded-xl p-4 shadow-inner relative">
+                    <div class="absolute top-3 right-3 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded-sm uppercase tracking-widest font-mono">
+                        Interactive Canvas
+                    </div>
+                    <h3 class="text-white text-xs font-mono mb-2 text-slate-400">Click anywhere on the plot lines to sample rates:</h3>
+                    <!-- Chart container -->
+                    <div class="relative w-full h-[320px]">
+                        <canvas id="growthChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Interactive Output Display Card -->
+                <div id="inspector-panel" class="mt-6 p-5 bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-xl border border-slate-700 shadow-lg transition-all duration-300 transform">
+                    <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-3">
+                        <h3 class="font-bold text-sm tracking-wide text-emerald-400 uppercase">Calculus Field Inspector</h3>
+                        <span id="selected-day-badge" class="bg-slate-700 text-slate-200 font-mono text-xs px-3 py-1 rounded-md">Day: --</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <span class="text-xs text-slate-400 block uppercase font-medium">Cumulative Weight $f(x)$</span>
+                            <span id="output-weight" class="text-2xl font-bold tracking-tight text-white">--</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 block uppercase font-medium">Instantaneous Growth Rate $f'(x)$</span>
+                            <span id="output-rate" class="text-2xl font-bold tracking-tight text-amber-400">--</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 bg-slate-950/60 p-3 rounded-lg border border-slate-800">
+                        <span class="text-xs text-emerald-400 font-bold block uppercase tracking-wider mb-1">What this means in the field:</span>
+                        <p id="layman-explanation" class="text-xs md:text-sm text-slate-300 italic">
+                            Click on the chart lines above to calculate the exact crop growth behavior at that specific stage of the harvest cycle.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <!-- Footer Info -->
+        <div class="bg-slate-100 px-6 py-4 border-t border-slate-200 text-center text-xs text-slate-500">
+            Designed for Malaysian Food Security Systems Optimization Frameworks • Driven by Chart.js Engine
+        </div>
+    </div>
+
+    <!-- Application JavaScript Business Logic -->
+    <script>
+        // Constants matching Malaysian palm physiological data modeling
+        const L = 25;    // Carrying capacity in kg
+        const k = 0.08;  // Growth factor rate constant
+        const x0 = 90;   // Midpoint day of bunch maturation
+
+        // Generating array datasets for the chart (0 to 180 days representing a full bunch development)
+        const daysData = [];
+        const weightData = [];
+        const rateData = [];
+
+        for (let day = 0; day <= 180; day += 2) {
+            daysData.push(day);
+            
+            // 1. Calculate Logistic Curve Function Value: f(x)
+            const fx = L / (1 + Math.exp(-k * (day - x0)));
+            weightData.push(fx.toFixed(2));
+            
+            // 2. Calculate Derivative Value: f'(x) using its algebraic logistic identity form
+            const dfx = k * fx * (1 - (fx / L));
+            rateData.push(dfx.toFixed(3));
+        }
+
+        // Initialize and draw Chart.js
+        const ctx = document.getElementById('growthChart').getContext('2d');
+        const growthChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: daysData,
+                datasets: [
+                    {
+                        label: 'Cumulative FFB Weight f(x) [kg]',
+                        data: weightData,
+                        borderColor: '#10b981', // emerald-500
+                        backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                        borderWidth: 3,
+                        yAxisID: 'yWeight',
+                        tension: 0.2,
+                        pointRadius: 0,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: "Growth Rate f'(x) [kg/day]",
+                        data: rateData,
+                        borderColor: '#f59e0b', // amber-500
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        yAxisID: 'yRate',
+                        tension: 0.2,
+                        pointRadius: 0,
+                        pointHoverRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        labels: { color: '#94a3b8', font: { size: 11 } },
+                        position: 'top'
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleColor: '#34d399',
+                        bodyColor: '#fff',
+                        multiKeyBackground: 'transparent'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Time Sequence (Days from bunch formation)', color: '#94a3b8', font: { size: 11 } },
+                        grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                        ticks: { color: '#64748b' }
+                    },
+                    yWeight: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { display: true, text: 'Total Bunch Mass (kg)', color: '#10b981' },
+                        grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                        ticks: { color: '#64748b' },
+                        min: 0,
+                        max: 30
+                    },
+                    yRate: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: { display: true, text: 'Daily Expansion Rate (kg/day)', color: '#f59e0b' },
+                        grid: { drawOnChartArea: false },
+                        ticks: { color: '#64748b' },
+                        min: 0,
+                        max: 0.6
+                    }
+                },
+                // Trigger action when user clicks anywhere inside the graph interface
+                onClick: (e) => {
+                    const points = growthChart.getElementsAtEventForMode(e, 'index', { intersect: false }, true);
+                    if (points.length > 0) {
+                        const index = points[0].index;
+                        const targetDay = daysData[index];
+                        const targetWeight = weightData[index];
+                        const targetRate = rateData[index];
+                        
+                        updateInspectorDashboard(targetDay, targetWeight, targetRate);
+                    }
+                }
+            }
+        });
+
+        // Function to evaluate values and supply responsive bioscience insights
+        function updateInspectorDashboard(day, weight, rate) {
+            document.getElementById('selected-day-badge').innerText = `Day: ${day}`;
+            document.getElementById('output-weight').innerText = `${weight} kg`;
+            document.getElementById('output-rate').innerText = `${rate} kg/day`;
+
+            const insightText = document.getElementById('layman-explanation');
+            
+            // Logic rules determining biological states based on derivative properties
+            if (day < 60) {
+                insightText.innerHTML = `<strong>Early Cell Division Stage:</strong> The bunch is growing slowly ($f'(x) = ${rate}\text{ kg/day}$). The derivative is small but expanding positive. Internal resources are establishing foundations; fertilizer applied now will yield minimal immediate efficiency.`;
+            } else if (day >= 60 && day <= 120) {
+                if (Math.abs(day - 90) <= 4) {
+                    insightText.innerHTML = `<strong>CRITICAL INFLECTION POINT (Peak Efficiency):</strong> The growth velocity $f'(x)$ is at its maximum absolute velocity (${rate} kg/day). The bunch is packing on mass faster than at any other period. **Apply fertilizer now** to satisfy maximum biological demand and secure optimum lipid conversion.`;
+                } else {
+                    insightText.innerHTML = `<strong>Exponential Growth Acceleration Phase:</strong> The derivative is highly elevated ($f'(x) = ${rate}\text{ kg/day}$). The fruit bunch is undergoing severe rapid physical expansion, converting nutrient feeds into mass at high speed.`;
+                }
+            } else {
+                insightText.innerHTML = `<strong>Saturation & Ripening Phase:</strong> Growth speed is grinding to a halt because the derivative $f'(x)$ is dropping down toward zero (${rate} kg/day) as $f(x)$ approaches carrying capacity ($L$). Energy has shifted entirely from cell weight growth to inward palm oil synthesis.`;
+            }
+            
+            // Visual pulse effect for interaction acknowledgment
+            const panel = document.getElementById('inspector-panel');
+            panel.classList.remove('scale-[0.99]');
+            void panel.offsetWidth; // Force DOM layout reflow
+            panel.classList.add('scale-[0.99]');
+            setTimeout(() => panel.classList.remove('scale-[0.99]'), 150);
+        }
+    </script>
+</body>
+</html>
